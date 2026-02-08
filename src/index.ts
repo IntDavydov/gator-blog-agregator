@@ -2,12 +2,11 @@ import {
   type CommandsRegistry,
   runCommand,
   registerCommand,
-  handlerLogin,
-  handlerRegister,
-  handlerReset,
-  handlerUsers,
 } from "./commands.js";
 import { argv } from "node:process";
+import { handlerReset } from "./reset.js";
+import { handlerLogin, handlerRegister, handlerUsers } from "./users.js";
+import { handlerAgg } from "./aggregate.js";
 
 async function main(): Promise<void> {
   const cliArgs = argv.slice(2);
@@ -24,6 +23,7 @@ async function main(): Promise<void> {
   registerCommand(commandsRegistry, "register", handlerRegister);
   registerCommand(commandsRegistry, "reset", handlerReset);
   registerCommand(commandsRegistry, "users", handlerUsers);
+  registerCommand(commandsRegistry, "agg", handlerAgg);
 
   try {
     await runCommand(commandsRegistry, cmdName, ...args);
