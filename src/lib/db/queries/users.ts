@@ -18,12 +18,15 @@ export async function getUser(name: string): Promise<User> {
   return result; // returns User object or undefined
 }
 
+export async function getUserById(id: string): Promise<User> {
+  const [result] = await db.select().from(users).where(eq(users.id, id));
+  return result;
+}
+
 export async function getUsers(): Promise<User[]> {
   return await db.select().from(users); // empty array or array of Users
 }
 
 export async function resetUsers(): Promise<void> {
-  await db.delete(users)
-
-  // await db.execute(`TRUNCATE TABLE users RESTART IDENTITY CASCADE`);
+  await db.delete(users);
 }

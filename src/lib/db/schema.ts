@@ -1,7 +1,15 @@
 import { InferSelectModel } from "drizzle-orm";
-import { pgTable, timestamp, uuid, text } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  timestamp,
+  uuid,
+  text,
+  unique,
+  primaryKey,
+} from "drizzle-orm/pg-core";
 
 export type User = InferSelectModel<typeof users>;
+export type Feed = InferSelectModel<typeof feeds>;
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom().notNull(), // uuid is a string
@@ -20,10 +28,28 @@ export const feeds = pgTable("feeds", {
     .notNull()
     .defaultNow()
     .$onUpdate(() => new Date()),
-  name: text("name").notNull().unique(),
+  name: text("name").notNull(),
   url: text("url").notNull().unique(),
-  user_id: text("user_id")
+  userId: uuid("user_id")
     .notNull()
     .unique()
     .references(() => users.id, { onDelete: "cascade" }),
 });
+
+export const feedFollows = pgTable(
+  "feed_follows",
+  {
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    feedId: uuid("feed_id")
+      .notNull()
+      .references(() => feeds.id, { onDelete: "cascade" }),
+  },
+  (tabel) => [primaryKey({ columns: [tabel.userId, tabel.feedId] })],
+);

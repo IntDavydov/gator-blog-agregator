@@ -3,7 +3,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
-type Config = {
+export type Config = {
   dbUrl: string;
   currentUserName?: string;
 };

@@ -67,7 +67,7 @@ function isRSSChannel(channel: FeedChannel): channel is FeedChannel {
     !description ||
     typeof description !== "string"
   ) {
-    console.error("Wrong data type or lack of fields");
+    console.error(`Wrong data type or lack of fields`);
     return false;
   }
 

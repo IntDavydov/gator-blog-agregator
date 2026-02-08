@@ -1,4 +1,4 @@
-import { readConfig, setUser } from "./config.js";
+import { Config, readConfig, setUser } from "./config.js";
 import { createUser, getUser, getUsers } from "./lib/db/queries/users.js";
 
 export async function handlerLogin(
@@ -14,12 +14,14 @@ export async function handlerLogin(
   const user = await getUser(username); // User object or undefined
 
   if (!user) {
-    throw new Error(`Wrong credentials: username ${username} is not registered.`);
+    throw new Error(
+      `Wrong credentials: username ${username} is not registered.`,
+    );
   }
 
   await setUser(username);
   const config = await readConfig();
-  console.log("=== User is created ===\n", config);
+  printSucces(config, "logged in", username);
 }
 
 export async function handlerRegister(
@@ -40,7 +42,7 @@ export async function handlerRegister(
   await setUser(username);
 
   const config = await readConfig();
-  console.log("=== User registered successfully ===\n", config);
+  printSucces(config, "registered", username);
 }
 
 export async function handlerUsers(_: string): Promise<void> {
@@ -57,4 +59,12 @@ export async function handlerUsers(_: string): Promise<void> {
       `* ${user.name} ${currentUserName === user.name ? "(current)" : ""}`,
     );
   }
+}
+
+function printSucces(config: Config, action: string, username?: string) {
+  console.log(
+    `=== User ${username ? username : ""} ${action} successfully ===\n`,
+  );
+  console.log(config);
+  console.log("\n===========================================");
 }
