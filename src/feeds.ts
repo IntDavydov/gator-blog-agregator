@@ -1,7 +1,10 @@
 import { readConfig } from "./config.js";
 import { addFeed, getFeeds } from "./lib/db/queries/feeds.js";
+import { createFeedFollow } from "./lib/db/queries/follows.js";
 import { getUser, getUserById } from "./lib/db/queries/users.js";
-import { Feed, User } from "./lib/db/schema.js";
+import { Feed } from "./lib/db/schema.js";
+import { printCreatedFeed, printFollow } from "./prints.js";
+import { isConfigUsername, isUser } from "./utils.js";
 
 export async function handlerAddfeed(
   cmdName: string,
@@ -12,25 +15,20 @@ export async function handlerAddfeed(
   }
 
   const config = await readConfig();
-  if (!config.currentUserName) {
-    throw new Error("You're not logged in.");
-  }
+  const currentUserName = isConfigUsername(config.currentUserName); // error thrown or string
 
   const [feedName, feedUrl] = args;
-  const user = await getUser(config.currentUserName);
-
-  if (!user) {
-    throw new Error(
-      `User ${config.currentUserName} is not registered in data base. Try to register again.`,
-    );
-  }
+  const user = await getUser(currentUserName);
+  isUser(currentUserName, user);
 
   const feed = await addFeed(feedName, feedUrl, user.id);
-
   if (!feed) {
     throw new Error(`Feed from ${feedUrl} already exists.`);
   }
-
+  
+  const feedFollow = await createFeedFollow(user.id, feed.id);
+  printFollow(feedFollow);
+  
   printCreatedFeed(user, feed);
 }
 
@@ -45,37 +43,28 @@ export async function handlerFeeds(_: string): Promise<void> {
   await printFeeds(feeds);
 }
 
-function printCreatedFeed(user: User, feed: Feed): void {
-  console.log("=== Feed created successfuly ===\n");
-  console.log("User: ", user.name);
-  console.log("Created a feed: ");
-  console.log(`* name: ${feed.name}`);
-  console.log(`* url: ${feed.url}`);
-  console.log("\n================================");
-}
-
 async function printFeeds(feeds: Feed[]): Promise<void> {
   console.log("=== Feeds ===\n");
-  
+
   let count = 1;
   for (const feed of feeds) {
     const user = await getUserById(feed.userId);
-    if(!user) {
-      throw new Error(`Failde to find user for feed ${feed.id}`)
+    if (!user) {
+      throw new Error(`Failde to find user for feed ${feed.id}`);
     }
 
-    console.log(`Feed ${count}: `)
+    console.log(`Feed ${count}: `);
 
     console.log(` * createdBy: ${user.name}`);
     console.log(` * name: ${feed.name}`);
     console.log(` * url: ${feed.url}`);
 
-    if(count < feeds.length) {
-      console.log()
+    if (count < feeds.length) {
+      console.log();
     }
 
     count += 1;
   }
-  
+
   console.log("\n=============");
 }

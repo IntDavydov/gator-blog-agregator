@@ -13,8 +13,11 @@ export async function createUser(name: string): Promise<User> {
   return result; // returns created User object or undefined
 }
 
-export async function getUser(name: string): Promise<User> {
-  const [result] = await db.select().from(users).where(eq(users.name, name)); // undefined if not found
+export async function getUser(userName: string): Promise<User> {
+  const [result] = await db
+    .select()
+    .from(users)
+    .where(eq(users.name, userName)); // undefined if not found
   return result; // returns User object or undefined
 }
 

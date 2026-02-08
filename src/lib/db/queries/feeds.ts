@@ -1,5 +1,7 @@
+import { eq } from "drizzle-orm";
 import { db } from "../index.js";
 import { Feed, feeds } from "../schema.js";
+import { ensureDBCall } from "src/utils.js";
 
 export async function addFeed(
   name: string,
@@ -17,4 +19,10 @@ export async function addFeed(
 
 export async function getFeeds(): Promise<Feed[]> {
   return await db.select().from(feeds); // empty array or array of Feed objects
+}
+
+export async function getFeedByURL(url: string): Promise<Feed> {
+  const [result] = await db.select().from(feeds).where(eq(feeds.url, url));
+  const feedRecord = ensureDBCall(result); // error thrown or Feed object returned
+  return feedRecord;
 }

@@ -8,9 +8,9 @@ export type Config = {
   currentUserName?: string;
 };
 
-export async function setUser(username: string): Promise<void> {
+export async function setUser(userName: string): Promise<void> {
   const config = await readConfig();
-  config.currentUserName = username;
+  config.currentUserName = userName;
   await writeConfig(config);
 }
 

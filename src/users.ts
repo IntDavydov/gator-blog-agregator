@@ -1,55 +1,48 @@
 import { Config, readConfig, setUser } from "./config.js";
 import { createUser, getUser, getUsers } from "./lib/db/queries/users.js";
+import { isOneArg, isUser } from "./utils.js";
 
 export async function handlerLogin(
   cmdName: string,
   ...args: string[]
 ): Promise<void> {
-  if (args.length === 0) {
-    throw new Error(`No username provided: ${cmdName} <name>`);
-  }
+  isOneArg(args, `No username provided: ${cmdName} <name>`);
 
-  const username = args[0];
+  const userName = args[0];
 
-  const user = await getUser(username); // User object or undefined
+  const user = await getUser(userName); // User object or undefined
+  isUser(userName, user); // error thrown or user returned
 
-  if (!user) {
-    throw new Error(
-      `Wrong credentials: username ${username} is not registered.`,
-    );
-  }
-
-  await setUser(username);
+  await setUser(userName);
   const config = await readConfig();
-  printSucces(config, "logged in", username);
+  printSucces(config, "logged in", userName);
 }
 
 export async function handlerRegister(
   cmdName: string,
   ...args: string[]
 ): Promise<void> {
-  if (args.length === 0) {
-    throw new Error(`No username provided: ${cmdName} <name>`);
-  }
+  isOneArg(args, `No username provided: ${cmdName} <name>`);
 
-  const username = args[0];
+  const userName = args[0];
 
-  const user = await createUser(username); // undefined or created User object
+  const user = await createUser(userName); // undefined or created User object
   if (!user) {
-    throw new Error(`User ${username} already exists.`);
+    throw new Error(`User ${userName} already exists.`);
   }
 
-  await setUser(username);
+  await setUser(userName);
 
   const config = await readConfig();
-  printSucces(config, "registered", username);
+  printSucces(config, "registered", userName);
 }
 
 export async function handlerUsers(_: string): Promise<void> {
   const users = await getUsers(); // empty array or array of Users
 
   if (users.length === 0) {
-    throw new Error(`No users registered yet`);
+    console.log(`No users registered yet`);
+    return;
   }
 
   const { currentUserName } = await readConfig();
@@ -61,9 +54,9 @@ export async function handlerUsers(_: string): Promise<void> {
   }
 }
 
-function printSucces(config: Config, action: string, username?: string) {
+function printSucces(config: Config, action: string, userName?: string) {
   console.log(
-    `=== User ${username ? username : ""} ${action} successfully ===\n`,
+    `=== User ${userName ? userName : ""} ${action} successfully ===\n`,
   );
   console.log(config);
   console.log("\n===========================================");

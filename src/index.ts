@@ -8,6 +8,7 @@ import { handlerReset } from "./reset.js";
 import { handlerLogin, handlerRegister, handlerUsers } from "./users.js";
 import { handlerAgg } from "./aggregate.js";
 import { handlerAddfeed, handlerFeeds } from "./feeds.js";
+import { handlerFollow, handlerFollowing } from "./follows.js";
 
 async function main(): Promise<void> {
   const cliArgs = argv.slice(2); // first two args are pathes to executables: node and file
@@ -27,6 +28,8 @@ async function main(): Promise<void> {
   registerCommand(commandsRegistry, "agg", handlerAgg);
   registerCommand(commandsRegistry, "addfeed", handlerAddfeed);
   registerCommand(commandsRegistry, "feeds", handlerFeeds)
+  registerCommand(commandsRegistry, "follow", handlerFollow)
+  registerCommand(commandsRegistry, "following", handlerFollowing)
 
   try {
     await runCommand(commandsRegistry, cmdName, ...args);
