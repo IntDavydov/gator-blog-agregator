@@ -15,21 +15,24 @@ export async function fetchFeed(feedURL: string): Promise<RSSFeed> {
 
   const xml = await res.text();
   const parser = new XMLParser();
-  const feed = parser.parse(xml).rss;
+  const feed = parser.parse(xml);
 
   const channel = feed.rss?.channel;
-  if (!channel || !isRSSChannel(channel)) {
+  if (!isRSSChannel(channel)) {
     throw new Error("failed to parse channel");
   }
 
-  let rssItems: RSSItem[] = Array.isArray(channel.item)
+  const items: any[] = Array.isArray(channel.item)
     ? channel.item
     : [channel.item];
 
-  for (const item of rssItems) {
+  const rssItems: RSSItem[] = [];
+  for (const item of items) {
     if (!isRSSItem(item)) {
       continue;
     }
+
+    console.log("Adding: ", item);
 
     rssItems.push({
       title: item.title,

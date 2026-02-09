@@ -9,7 +9,7 @@ import {
 
 export type User = InferSelectModel<typeof users>;
 export type Feed = InferSelectModel<typeof feeds>;
-export type FeedFollow = InferSelectModel<typeof feedFollows>
+export type FeedFollow = InferSelectModel<typeof feedFollows>;
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom().notNull(), // uuid is a string

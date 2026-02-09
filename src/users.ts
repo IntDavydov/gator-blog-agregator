@@ -1,5 +1,6 @@
-import { Config, readConfig, setUser } from "./config.js";
+import { readConfig, setUser } from "./config.js";
 import { createUser, getUser, getUsers } from "./lib/db/queries/users.js";
+import { printSuccess } from "./prints.js";
 import { isOneArg, isUser } from "./utils.js";
 
 export async function handlerLogin(
@@ -15,7 +16,7 @@ export async function handlerLogin(
 
   await setUser(userName);
   const config = await readConfig();
-  printSucces(config, "logged in", userName);
+  printSuccess(config, "Logged in", userName);
 }
 
 export async function handlerRegister(
@@ -34,7 +35,7 @@ export async function handlerRegister(
   await setUser(userName);
 
   const config = await readConfig();
-  printSucces(config, "registered", userName);
+  printSuccess(config, "Registered", userName);
 }
 
 export async function handlerUsers(_: string): Promise<void> {
@@ -52,12 +53,4 @@ export async function handlerUsers(_: string): Promise<void> {
       `* ${user.name} ${currentUserName === user.name ? "(current)" : ""}`,
     );
   }
-}
-
-function printSucces(config: Config, action: string, userName?: string) {
-  console.log(
-    `=== User ${userName ? userName : ""} ${action} successfully ===\n`,
-  );
-  console.log(config);
-  console.log("\n===========================================");
 }

@@ -28,7 +28,7 @@ export function ensureDBCall<T>(
 
 export function isOneArg(
   args: string[],
-  message = "Cmd called without needed args",
+  message = "Cmd called without mandatory args",
 ): void {
   if (args.length === 0) {
     throw new Error(message);

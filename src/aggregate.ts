@@ -8,6 +8,6 @@ export async function handlerAgg(_: string): Promise<void> {
     console.log("Error: fetching rssFeed");
   }
 
-  const feedContentJSON = JSON.stringify(feedContent);
+  const feedContentJSON = JSON.stringify(feedContent, null, 2);
   console.log(feedContentJSON);
 }

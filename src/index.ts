@@ -8,7 +8,12 @@ import { handlerReset } from "./reset.js";
 import { handlerLogin, handlerRegister, handlerUsers } from "./users.js";
 import { handlerAgg } from "./aggregate.js";
 import { handlerAddfeed, handlerFeeds } from "./feeds.js";
-import { handlerFollow, handlerFollowing } from "./follows.js";
+import {
+  handlerFollow,
+  handlerPrintFollowing,
+  handlerUnfollow,
+} from "./follows.js";
+import { middlewareLoggedIn } from "./middleware.js";
 
 async function main(): Promise<void> {
   const cliArgs = argv.slice(2); // first two args are pathes to executables: node and file
@@ -26,10 +31,27 @@ async function main(): Promise<void> {
   registerCommand(commandsRegistry, "reset", handlerReset);
   registerCommand(commandsRegistry, "users", handlerUsers);
   registerCommand(commandsRegistry, "agg", handlerAgg);
-  registerCommand(commandsRegistry, "addfeed", handlerAddfeed);
-  registerCommand(commandsRegistry, "feeds", handlerFeeds)
-  registerCommand(commandsRegistry, "follow", handlerFollow)
-  registerCommand(commandsRegistry, "following", handlerFollowing)
+  registerCommand(
+    commandsRegistry,
+    "addfeed",
+    middlewareLoggedIn(handlerAddfeed),
+  );
+  registerCommand(commandsRegistry, "feeds", handlerFeeds);
+  registerCommand(
+    commandsRegistry,
+    "follow",
+    middlewareLoggedIn(handlerFollow),
+  );
+  registerCommand(
+    commandsRegistry,
+    "following",
+    middlewareLoggedIn(handlerPrintFollowing),
+  );
+  registerCommand(
+    commandsRegistry,
+    "unfollow",
+    middlewareLoggedIn(handlerUnfollow),
+  );
 
   try {
     await runCommand(commandsRegistry, cmdName, ...args);

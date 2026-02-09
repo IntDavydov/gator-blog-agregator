@@ -1,25 +1,19 @@
-import { readConfig } from "./config.js";
 import { addFeed, getFeeds } from "./lib/db/queries/feeds.js";
 import { createFeedFollow } from "./lib/db/queries/follows.js";
-import { getUser, getUserById } from "./lib/db/queries/users.js";
-import { Feed } from "./lib/db/schema.js";
-import { printCreatedFeed, printFollow } from "./prints.js";
-import { isConfigUsername, isUser } from "./utils.js";
+import { getUserById } from "./lib/db/queries/users.js";
+import { Feed, User } from "./lib/db/schema.js";
+import { printCreatedFeed, printFollowUnfollow } from "./prints.js";
 
 export async function handlerAddfeed(
   cmdName: string,
+  user: User,
   ...args: string[]
 ): Promise<void> {
   if (args.length <= 1) {
     throw new Error(`Feed name or url not provided: ${cmdName} <name> <url>`);
   }
-
-  const config = await readConfig();
-  const currentUserName = isConfigUsername(config.currentUserName); // error thrown or string
-
+  
   const [feedName, feedUrl] = args;
-  const user = await getUser(currentUserName);
-  isUser(currentUserName, user);
 
   const feed = await addFeed(feedName, feedUrl, user.id);
   if (!feed) {
@@ -27,7 +21,7 @@ export async function handlerAddfeed(
   }
   
   const feedFollow = await createFeedFollow(user.id, feed.id);
-  printFollow(feedFollow);
+  printFollowUnfollow(feedFollow, "followed");
   
   printCreatedFeed(user, feed);
 }
