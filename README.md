@@ -20,7 +20,6 @@ The CLI stores its configuration in a hidden file in your **home directory** nam
 
    ```
    touch ~/.gatorconfig.json
-
    ```
 
 2. Add the following structure to the file, replacing the values with your actual database credentials:
@@ -41,10 +40,11 @@ Ensure you have a **PostgreSQL** instance running. You can host this locally or 
 
 Update your `~/.gatorconfig.json` with your connection string:
 
-```json
+```
 {
   "db_url": "postgres://user:password@localhost:5432/gator_db"
 }
+```
 
 ### 3. Generate Migrations
 
