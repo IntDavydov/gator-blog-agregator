@@ -1,6 +1,7 @@
 import { Config } from "./config.js";
 import { FeedFollowInfo, ReturnFeedFollow } from "./lib/db/queries/follows.js";
-import { Feed, User } from "./lib/db/schema.js";
+import { getUserById } from "./lib/db/queries/users.js";
+import { Feed, Post, User } from "./lib/db/schema.js";
 import { timeOtions } from "./utils.js";
 
 export function printCreatedFeed(user: User, feed: Feed): void {
@@ -38,10 +39,6 @@ export function printFollowUnfollow(
   console.log("\n================================");
 }
 
-export function printUnfollow(user: User, feed: Feed): void {
-  console.log("=== You've unfollower the feed ===\n");
-}
-
 export function printUserFollows(
   userName: string,
   userFeedFollows: FeedFollowInfo[],
@@ -62,8 +59,52 @@ export function printUserFollows(
   console.log("\n===========================");
 }
 
-export function printSuccess(config: Config, action: string, userName: string) {
+export function printSuccess(
+  config: Config,
+  action: string,
+  userName: string,
+): void {
   console.log(`=== ${action} as ${userName} successfully ===\n`);
   console.log(config);
   console.log("\n===========================================");
+}
+
+export async function printFeeds(feeds: Feed[]): Promise<void> {
+  console.log("=== Feeds ===\n");
+
+  let count = 1;
+  for (const feed of feeds) {
+    const user = await getUserById(feed.userId);
+    if (!user) {
+      throw new Error(`Failde to find user for feed ${feed.id}`);
+    }
+
+    console.log(`Feed ${count}: `);
+
+    console.log(` * createdBy: ${user.name}`);
+    console.log(` * name: ${feed.name}`);
+    console.log(` * url: ${feed.url}`);
+
+    if (count < feeds.length) {
+      console.log();
+    }
+
+    count += 1;
+  }
+
+  console.log("\n=============");
+}
+
+export function printPosts(posts: Post[]): void {
+  console.log("=== Posts ===\n");
+  for (let i = 0; i < posts.length; i++) {
+    console.log(`Post ${i + 1}`);
+    console.log(` * title: ${posts[i].title}`);
+    console.log(` * description: ${posts[i].description}`);
+    console.log(` * link: ${posts[i].link}`);
+    console.log(
+      ` * date: ${posts[i].pubDate.toLocaleString("en-US", timeOtions)}`,
+    );
+  }
+  console.log("\n==================");
 }

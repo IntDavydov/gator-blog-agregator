@@ -14,6 +14,7 @@ import {
   handlerUnfollow,
 } from "./follows.js";
 import { middlewareLoggedIn } from "./middleware.js";
+import { handlerBrowse } from "./posts.js";
 
 async function main(): Promise<void> {
   const cliArgs = argv.slice(2); // first two args are pathes to executables: node and file
@@ -51,6 +52,11 @@ async function main(): Promise<void> {
     commandsRegistry,
     "unfollow",
     middlewareLoggedIn(handlerUnfollow),
+  );
+  registerCommand(
+    commandsRegistry,
+    "browse",
+    middlewareLoggedIn(handlerBrowse),
   );
 
   try {

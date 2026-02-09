@@ -1,5 +1,23 @@
 import { XMLParser } from "fast-xml-parser";
 
+export type RSSFeed = {
+  channel: {
+    title: string;
+    link: string;
+    description: string;
+    item: RSSItem[];
+  };
+};
+
+type FeedChannel = RSSFeed["channel"];
+
+type RSSItem = {
+  title: string;
+  link: string;
+  description: string;
+  pubDate: string;
+};
+
 export async function fetchFeed(feedURL: string): Promise<RSSFeed> {
   const res = await fetch(feedURL, {
     method: "GET",
@@ -32,8 +50,6 @@ export async function fetchFeed(feedURL: string): Promise<RSSFeed> {
       continue;
     }
 
-    console.log("Adding: ", item);
-
     rssItems.push({
       title: item.title,
       link: item.link,
@@ -51,6 +67,7 @@ export async function fetchFeed(feedURL: string): Promise<RSSFeed> {
     },
   };
 
+  console.log("Rss feed final shape: ", rssFeed);
   return rssFeed;
 }
 
@@ -87,21 +104,3 @@ function isRSSItem(item: RSSItem): item is RSSItem {
     typeof pubDate === "string"
   );
 }
-
-type RSSFeed = {
-  channel: {
-    title: string;
-    link: string;
-    description: string;
-    item: RSSItem[];
-  };
-};
-
-type FeedChannel = RSSFeed["channel"];
-
-type RSSItem = {
-  title: string;
-  link: string;
-  description: string;
-  pubDate: string;
-};

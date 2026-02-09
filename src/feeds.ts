@@ -1,8 +1,7 @@
 import { addFeed, getFeeds } from "./lib/db/queries/feeds.js";
 import { createFeedFollow } from "./lib/db/queries/follows.js";
-import { getUserById } from "./lib/db/queries/users.js";
-import { Feed, User } from "./lib/db/schema.js";
-import { printCreatedFeed, printFollowUnfollow } from "./prints.js";
+import { User } from "./lib/db/schema.js";
+import { printCreatedFeed, printFeeds, printFollowUnfollow } from "./prints.js";
 
 export async function handlerAddfeed(
   cmdName: string,
@@ -35,30 +34,4 @@ export async function handlerFeeds(_: string): Promise<void> {
   }
 
   await printFeeds(feeds);
-}
-
-async function printFeeds(feeds: Feed[]): Promise<void> {
-  console.log("=== Feeds ===\n");
-
-  let count = 1;
-  for (const feed of feeds) {
-    const user = await getUserById(feed.userId);
-    if (!user) {
-      throw new Error(`Failde to find user for feed ${feed.id}`);
-    }
-
-    console.log(`Feed ${count}: `);
-
-    console.log(` * createdBy: ${user.name}`);
-    console.log(` * name: ${feed.name}`);
-    console.log(` * url: ${feed.url}`);
-
-    if (count < feeds.length) {
-      console.log();
-    }
-
-    count += 1;
-  }
-
-  console.log("\n=============");
 }
